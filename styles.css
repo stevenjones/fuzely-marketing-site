@@ -1,0 +1,40 @@
+/* Fuzely — approved responsive marketing site */
+
+*{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:88px}
+  html,body{margin:0;padding:0}
+  :root{--accent:linear-gradient(135deg,oklch(0.56 0.16 264),oklch(0.52 0.2 293));--accent-solid:oklch(0.55 0.17 275)}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:oklch(0.27 0.015 262);background:#fff;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  input,select,textarea,button{font-family:inherit}
+  ::placeholder{color:oklch(0.72 0.01 260)}
+  a{color:var(--accent-solid);text-decoration:none}
+  a:hover{color:oklch(0.46 0.17 275)}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 oklch(0.62 0.15 150 / .5)}70%{box-shadow:0 0 0 7px oklch(0.62 0.15 150 / 0)}100%{box-shadow:0 0 0 0 oklch(0.62 0.15 150 / 0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes caretblink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes shimmer{0%{background-position:-220px 0}100%{background-position:220px 0}}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes fillbar{0%{width:8%}45%{width:66%}100%{width:66%}}
+  @keyframes dashmove{to{background-position:20px 0}}
+
+/* ---- Responsive branch visibility (breakpoint: 840px) ---- */
+@media (max-width:839.98px){.dt-only{display:none !important}html{scroll-padding-top:76px}}
+@media (min-width:840px){.mb-only{display:none !important}}
+
+/* ---- Mobile nav state ---- */
+.menu-panel{max-height:0}
+.menu-panel.open{max-height:360px}
+
+/* ---- FAQ accordion state ---- */
+.faq-panel{max-height:0}
+.faq-item.open .faq-panel{max-height:340px}
+.faq-icon{transform:rotate(0deg)}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+
+/* ---- Hover / focus / active states (from prototype) ---- */
+.st-ho-1:hover{background:oklch(0.965 0.004 255) !important;color:oklch(0.25 0.015 262) !important}
+.st-ho-2:hover{filter:brightness(1.06) !important}
+.st-ho-3:hover{filter:brightness(1.06) !important;transform:translateY(-1px) !important}
+.st-ho-4:hover{background:oklch(0.97 0.004 255) !important;border-color:oklch(0.82 0.008 260) !important}
+.st-fo-5:focus{border-color:oklch(0.55 0.16 262) !important;box-shadow:0 0 0 3px oklch(0.55 0.16 262 / .14) !important;outline:none !important}
+.st-ho-6:hover{color:oklch(0.46 0.17 288) !important}

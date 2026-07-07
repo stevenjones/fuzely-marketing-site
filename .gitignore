@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node (only if tooling is ever added — this site ships with no build step)
+node_modules/
+package-lock.json
+
+# Local env / secrets (none today; guard for future waitlist endpoint config)
+.env
+.env.*
