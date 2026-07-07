@@ -5,6 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fuzely — AI-Powered Experimentation &amp; CRO</title>
 <meta name="description" content="Fuzely finds what to test, generates on-brand concepts, launches variants against live traffic, and hands you the results in plain language.">
+
+<!-- Favicon: SVG logomark (currentColor). Link tags only — logo asset unchanged.
+     A PNG/ICO fallback + apple-touch-icon PNG can be added later (see docs/deployment.md). -->
+<link rel="icon" type="image/svg+xml" href="assets/fuzely-logo.svg">
+
+<!-- Open Graph / Twitter social preview. Tone matches the approved messaging.
+     og:image is intentionally omitted until a real 1200x630 share image exists
+     (documented as a follow-up in docs/future-routes.md) — an SVG logo does not
+     render reliably as a social image. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fuzely">
+<meta property="og:title" content="Fuzely — AI-Powered Experimentation &amp; CRO">
+<meta property="og:description" content="Fuzely finds what to test, generates on-brand concepts, launches variants against live traffic, and hands you the results in plain language. Private beta — first 50 teams, free during beta.">
+<meta property="og:url" content="https://www.fuzely.ai/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fuzely — AI-Powered Experimentation &amp; CRO">
+<meta name="twitter:description" content="AI-powered experimentation &amp; CRO. Private beta — first 50 teams, free during beta.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
@@ -1138,14 +1156,15 @@
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:oklch(0.5 0.17 288);margin-bottom:10px">Beta application</div>
       <div style="font-size:21px;font-weight:600;letter-spacing:-0.02em;color:oklch(0.2 0.02 265);margin-bottom:5px">Apply for early access</div>
       <div style="font-size:13.5px;color:oklch(0.52 0.012 260);margin-bottom:22px">Takes about a minute — we review every application.</div>
+      <form data-beta-form novalidate style="display:contents">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
-        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Name</label><input type="text" placeholder="Jane Rivera" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Work email</label><input type="email" placeholder="jane@company.com" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Company</label><input type="text" placeholder="Company, Inc." style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Website URL</label><input type="text" placeholder="company.com" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Role</label><input type="text" placeholder="Head of Growth" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Name</label><input type="text" name="name" aria-label="Name" placeholder="Jane Rivera" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Work email</label><input type="email" name="email" aria-label="Work email" placeholder="jane@company.com" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Company</label><input type="text" name="company" aria-label="Company" placeholder="Company, Inc." style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Website URL</label><input type="text" name="website" aria-label="Website URL" placeholder="company.com" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Role</label><input type="text" name="role" aria-label="Role" placeholder="Head of Growth" style="width:100%;height:40px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
         <div><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Primary interest</label>
-          <select style="width:100%;height:40px;padding:0 10px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:13.5px;color:oklch(0.27 0.015 262);background:#fff;cursor:pointer" class="st-fo-5">
+          <select name="interest" aria-label="Primary interest" style="width:100%;height:40px;padding:0 10px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:13.5px;color:oklch(0.27 0.015 262);background:#fff;cursor:pointer" class="st-fo-5">
             <option>CRO &amp; experimentation</option>
             <option>Landing page optimization</option>
             <option>AI-generated variants</option>
@@ -1155,8 +1174,10 @@
           </select>
         </div>
       </div>
-      <div style="margin-top:13px"><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Anything else? <span style="color:oklch(0.65 0.01 260);font-weight:400">(optional)</span></label><textarea rows="3" placeholder="What are you hoping to test first?" style="width:100%;padding:10px 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;line-height:1.5;color:oklch(0.27 0.015 262);resize:vertical" class="st-fo-5"></textarea></div>
+      <div style="margin-top:13px"><label style="display:block;font-size:12px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Anything else? <span style="color:oklch(0.65 0.01 260);font-weight:400">(optional)</span></label><textarea rows="3" name="notes" aria-label="Anything else?" placeholder="What are you hoping to test first?" style="width:100%;padding:10px 12px;border:1px solid oklch(0.9 0.006 260);border-radius:9px;font-size:14px;line-height:1.5;color:oklch(0.27 0.015 262);resize:vertical" class="st-fo-5"></textarea></div>
       <button style="width:100%;margin-top:18px;height:48px;border-radius:11px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px -10px oklch(0.55 0.17 275/.7)" class="st-ho-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10Z"></path></svg>Apply for early access</button>
+      <div data-beta-msg hidden role="status" aria-live="polite" style="margin-top:14px;font-size:13px;line-height:1.5;text-align:center;color:oklch(0.42 0.012 260)"></div>
+      </form>
       <div style="margin-top:12px;text-align:center;font-size:11.5px;color:oklch(0.58 0.01 260)">No credit card. We’ll only email you about your application.</div>
     </div>
   </div>
@@ -1181,14 +1202,15 @@
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:oklch(0.5 0.17 288);margin-bottom:9px">Beta application</div>
       <div style="font-size:20px;font-weight:600;letter-spacing:-0.02em;color:oklch(0.2 0.02 265);margin-bottom:4px">Apply for early access</div>
       <div style="font-size:13.5px;color:oklch(0.52 0.012 260);margin-bottom:20px">Takes about a minute — we review every application.</div>
+      <form data-beta-form novalidate style="display:contents">
       <div style="display:flex;flex-direction:column;gap:14px">
-        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Name</label><input type="text" placeholder="Jane Rivera" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Work email</label><input type="email" placeholder="jane@company.com" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Company</label><input type="text" placeholder="Company, Inc." style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Website URL</label><input type="text" placeholder="company.com" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
-        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Role</label><input type="text" placeholder="Head of Growth" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Name</label><input type="text" name="name" aria-label="Name" placeholder="Jane Rivera" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Work email</label><input type="email" name="email" aria-label="Work email" placeholder="jane@company.com" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Company</label><input type="text" name="company" aria-label="Company" placeholder="Company, Inc." style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Website URL</label><input type="text" name="website" aria-label="Website URL" placeholder="company.com" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
+        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Role</label><input type="text" name="role" aria-label="Role" placeholder="Head of Growth" style="width:100%;height:48px;padding:0 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;color:oklch(0.27 0.015 262)" class="st-fo-5"></div>
         <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Primary interest</label>
-          <select style="width:100%;height:48px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:14.5px;color:oklch(0.27 0.015 262);background:#fff;cursor:pointer" class="st-fo-5">
+          <select name="interest" aria-label="Primary interest" style="width:100%;height:48px;padding:0 12px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:14.5px;color:oklch(0.27 0.015 262);background:#fff;cursor:pointer" class="st-fo-5">
             <option>CRO &amp; experimentation</option>
             <option>Landing page optimization</option>
             <option>AI-generated variants</option>
@@ -1197,9 +1219,11 @@
             <option>Just exploring</option>
           </select>
         </div>
-        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Anything else? <span style="color:oklch(0.65 0.01 260);font-weight:400">(optional)</span></label><textarea rows="3" placeholder="What are you hoping to test first?" style="width:100%;padding:12px 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;line-height:1.5;color:oklch(0.27 0.015 262);resize:vertical" class="st-fo-5"></textarea></div>
+        <div><label style="display:block;font-size:13px;font-weight:500;color:oklch(0.45 0.012 260);margin-bottom:6px">Anything else? <span style="color:oklch(0.65 0.01 260);font-weight:400">(optional)</span></label><textarea rows="3" name="notes" aria-label="Anything else?" placeholder="What are you hoping to test first?" style="width:100%;padding:12px 14px;border:1px solid oklch(0.9 0.006 260);border-radius:10px;font-size:15px;line-height:1.5;color:oklch(0.27 0.015 262);resize:vertical" class="st-fo-5"></textarea></div>
       </div>
       <button style="width:100%;margin-top:18px;height:52px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px -10px oklch(0.55 0.17 275/.7)"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10Z"></path></svg>Apply for early access</button>
+      <div data-beta-msg hidden role="status" aria-live="polite" style="margin-top:14px;font-size:13.5px;line-height:1.5;text-align:center;color:oklch(0.42 0.012 260)"></div>
+      </form>
       <div style="margin-top:12px;text-align:center;font-size:12px;color:oklch(0.58 0.01 260)">No credit card. We’ll only email you about your application.</div>
     </div>
   </div>
@@ -1431,6 +1455,7 @@
 
 </div>
 
+<script src="config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

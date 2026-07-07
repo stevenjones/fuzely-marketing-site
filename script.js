@@ -4,6 +4,17 @@
 (function () {
   'use strict';
 
+  /* ================= Config + analytics/event hooks ================= */
+  // Config is loaded by config.js BEFORE this file. Guarded so a missing
+  // config.js never throws. track() is a NO-OP today: analytics.enabled is
+  // false, so it returns before doing anything — zero network, zero console
+  // noise in normal use. A provider forward gets implemented where noted.
+  var CONFIG = window.FUZELY_CONFIG || {};
+  function track(event, props) {
+    if (!CONFIG.analytics || !CONFIG.analytics.enabled) return;
+    /* future: forward { event: event, props: props } to the analytics provider */
+  }
+
   /* ================= Sticky header (desktop) ================= */
   var header = document.querySelector('[data-ref="header"]');
   var headerInner = document.querySelector('[data-ref="headerInner"]');
@@ -382,4 +393,100 @@
 
   setInterval(function () { tickHero(); tickHeroM(); }, 90);
   tickHero(); tickHeroM();
+
+  /* ================= Page-load + primary-CTA tracking (no-op today) ========= */
+  track('page_view', { path: location.pathname });
+  // Primary CTAs are in-page anchors (#beta / #beta-m) — "Join the Beta" in the
+  // header/hero and elsewhere. Bound here so index.html needs no markup change.
+  document.querySelectorAll('a[href="#beta"], a[href="#beta-m"]').forEach(function (a) {
+    a.addEventListener('click', function () { track('cta_click', { target: a.getAttribute('href') }); });
+  });
+
+  /* ================= Beta waitlist form (honest placeholder) ================ */
+  // Two identical copies (desktop #beta, mobile #beta-m), each marked
+  // [data-beta-form]. Behavior is identical for both. With no configured
+  // endpoint we NEVER show a success state — see docs/beta-form.md.
+  (function betaForms() {
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var ERROR_COLOR = 'oklch(0.62 0.2 25)';   // red — applied ONLY after a submit attempt
+    var FIELDS = ['name', 'email', 'company', 'website', 'role', 'interest', 'notes'];
+
+    document.querySelectorAll('form[data-beta-form]').forEach(function (form) {
+      var msg = form.querySelector('[data-beta-msg]');
+      var nameEl = form.querySelector('[name="name"]');
+      var emailEl = form.querySelector('[name="email"]');
+      // Capture each field's original inline border color so validation can
+      // restore it EXACTLY (never clears the border, which lives inline).
+      [nameEl, emailEl].forEach(function (el) { if (el) el.__origBorderColor = el.style.borderColor; });
+
+      function setBorder(el, bad) {
+        if (!el) return;
+        el.style.borderColor = bad ? ERROR_COLOR : el.__origBorderColor;
+      }
+      function showMsg(text, isError) {
+        if (!msg) return;
+        msg.textContent = text;
+        msg.style.color = isError ? 'oklch(0.55 0.2 25)' : 'oklch(0.42 0.012 260)';
+        msg.hidden = false;
+      }
+      function hideMsg() { if (msg) { msg.hidden = true; msg.textContent = ''; } }
+
+      // Restore the border as soon as the user edits name/email after an error.
+      form.addEventListener('input', function (e) {
+        var t = e.target;
+        if (t && (t.name === 'name' || t.name === 'email')) setBorder(t, false);
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        hideMsg();
+        var name = nameEl ? nameEl.value.trim() : '';
+        var email = emailEl ? emailEl.value.trim() : '';
+        var nameOk = name.length > 0;
+        var emailOk = EMAIL_RE.test(email);
+        setBorder(nameEl, !nameOk);
+        setBorder(emailEl, !emailOk);
+        track('beta_submit', { valid: nameOk && emailOk });
+
+        if (!nameOk || !emailOk) {
+          showMsg(
+            (!nameOk && !emailOk) ? 'Please enter your name and a valid email.'
+              : !nameOk ? 'Please enter your name.'
+              : 'Please enter a valid email address.',
+            true
+          );
+          return;
+        }
+
+        var payload = {};
+        FIELDS.forEach(function (k) {
+          var el = form.querySelector('[name="' + k + '"]');
+          if (el) payload[k] = (el.value || '').trim();
+        });
+
+        var endpoint = CONFIG.betaEndpoint;
+        if (!endpoint) {
+          // Honest: nothing was captured. Do NOT imply the user joined the list.
+          console.log('[Fuzely] Beta application (endpoint not configured — not submitted):', payload);
+          showMsg('Beta applications aren’t connected yet — check back soon.', false);
+          return;
+        }
+
+        // Endpoint configured → real submit + genuine success. Inert today because
+        // the shipped config value is null (this path exists for future wiring).
+        showMsg('Submitting…', false);
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(function (res) {
+          if (!res.ok) throw new Error('bad status ' + res.status);
+          form.reset();
+          showMsg('You’re on the list — we’ll be in touch about your application.', false);
+        }).catch(function () {
+          showMsg('Something went wrong sending your application. Please try again.', true);
+        });
+      });
+    });
+  })();
 })();
