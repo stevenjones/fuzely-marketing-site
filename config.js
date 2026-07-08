@@ -14,10 +14,11 @@ window.FUZELY_CONFIG = {
   // markup ships today — see docs/future-routes.md.
   appUrl: "https://app.fuzely.ai",
 
-  // Waitlist submit endpoint. NULL today → the beta form shows an honest
-  // "not connected yet" message and never implies a successful signup.
-  // Set to a POST URL to enable a real submit + genuine success state.
-  betaEndpoint: null,
+  // Waitlist submit endpoint. Wired to the Vercel serverless route that inserts
+  // into Supabase and sends a Resend notification (see api/beta-waitlist.js and
+  // docs/beta-form.md). Same-origin path — no CORS. Set back to null to revert
+  // to the honest "not connected yet" placeholder.
+  betaEndpoint: "/api/beta-waitlist",
 
   // Analytics is OFF today. track() is a no-op until this is flipped true
   // AND a provider forward is implemented in script.js.

@@ -1,94 +1,124 @@
-# Beta waitlist form — wiring guide
+# Beta waitlist form — WIRED
 
-The beta application form is **prepared for a backend but intentionally inert**
-until an endpoint is configured. There are two identical copies in `index.html`
-(desktop `#beta`, mobile `#beta-m`), each wrapped in a real
-`<form data-beta-form novalidate>`. Both behave identically; the handler lives in
-`script.js`.
+**Status: WIRED.** The beta form submits to a real backend:
 
-## Current behavior (no endpoint)
+```
+frontend form  ->  POST /api/beta-waitlist  ->  Supabase insert (+ Resend notify)
+```
 
-`config.js` ships with `betaEndpoint: null`. On submit, the handler:
+There are two identical copies in `index.html` (desktop `#beta`, mobile
+`#beta-m`), each a real `<form data-beta-form novalidate>`. Both behave
+identically; the client handler is in `script.js`, the server route is
+`api/beta-waitlist.js`, and the endpoint is set in `config.js`
+(`betaEndpoint: "/api/beta-waitlist"`).
 
-1. Prevents the default submit.
-2. Validates: **name** required, **email** required + basic format check.
-   Invalid fields get a red border **only after a submit attempt** (never on
-   page load), plus an inline error message.
-3. Because `betaEndpoint` is null, it **does not show a success state**. It shows
-   an honest, neutral message — *"Beta applications aren't connected yet — check
-   back soon."* — and logs the collected payload to the console for dev
-   verification. **Nothing is captured or sent.**
-4. Fires the no-op `track('beta_submit', …)` hook (does nothing until analytics
-   is enabled).
+## Client behavior (`script.js`)
 
-This is deliberate: we never imply a user joined the waitlist when nothing was
-stored.
+1. Prevents the default submit; fires the no-op `track('beta_submit', …)` hook.
+2. Validates **name** (required) and **email** (required + format). Invalid
+   fields get a red border **only after a submit attempt** (never on load) plus
+   an inline error message.
+3. On valid input: disables the submit button (prevents duplicate rapid
+   submits), shows "Submitting…", and POSTs JSON to `betaEndpoint` including a
+   hidden honeypot field, `page_url` (`location.href`), and `user_agent`.
+4. **Success** (`200 { ok: true }`): resets the form and shows a genuine success
+   state — *"You're on the list — we'll be in touch."* (or *"You're already on
+   the list…"* when the API reports a duplicate). Button re-enabled.
+5. **Error** (non-2xx / `ok:false` / network): shows a helpful inline message and
+   **re-enables** the button for retry. Never claims success.
 
-## Enabling real submissions
+If `betaEndpoint` is set back to `null`, the handler reverts to the honest
+"not connected yet" placeholder (never a fake success).
 
-1. **Set the endpoint** in `config.js`:
+## Server route (`api/beta-waitlist.js`)
 
-   ```js
-   window.FUZELY_CONFIG = {
-     …,
-     betaEndpoint: "https://your-endpoint.example.com/beta",
-   };
-   ```
+Vercel Node serverless function. **Zero npm dependencies** — talks to Supabase's
+REST (PostgREST) API and Resend's REST API via global `fetch`, so there is no
+install step for the function.
 
-2. With `betaEndpoint` set, a valid submit POSTs JSON to it and, on a `2xx`
-   response, resets the form and shows a **genuine** success message
-   (*"You're on the list…"*). A non-OK response / network failure shows an error
-   and does **not** claim success.
+Behavior:
+- **POST only** (405 otherwise).
+- **Honeypot:** if the hidden field is non-empty, returns `200 { ok: true }`
+  **without inserting** (drops the bot silently).
+- **Email normalization (required):** `email.trim().toLowerCase()` is computed
+  **before** validation and used for **both** the insert and duplicate handling,
+  so the DB's `UNIQUE(email)` constraint can't be bypassed by casing/whitespace.
+- **Validation:** name + email required, email format checked → `400` with a
+  clear message on failure.
+- **Insert:** into `public.beta_waitlist_leads` using the **service-role key**
+  (server-side only); captures `page_url` (from body) and `user_agent` (from the
+  request header).
+- **Duplicate email:** `UNIQUE` violation (HTTP 409 / Postgres `23505`) is a
+  **soft success** → `200 { ok: true, duplicate: true }`, not an error.
+- **Success is gated on the insert.** A non-duplicate insert failure returns
+  `500` with a neutral message — it never claims success.
+- **Resend notify (non-blocking):** after a successful insert, emails
+  `BETA_NOTIFY_EMAIL` from `support@fuzely.ai` (verified `fuzely.ai` domain) with
+  the lead details. If Resend fails, it is **logged** and the request **still
+  returns success** — a failed notification never fails the request or causes a
+  duplicate.
+- Responses are clean JSON (`{ ok: true }` / `{ ok: false, error }`) — **no
+  secrets, no stack traces**.
 
-No code change is needed to flip behavior — the handler already branches on
-`betaEndpoint` being null vs. set.
+## Required environment variables (Vercel — names only, never commit values)
 
-## Payload shape (JSON POST body)
+Set for **Production + Preview**:
 
-The handler sends the trimmed values of these named fields (identical across both
-copies):
+| Name | Purpose |
+|---|---|
+| `SUPABASE_URL` | Supabase project URL (REST base). |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service-role key — **server-side only**, never in client code. |
+| `RESEND_API_KEY` | Resend API key for the notification email. |
+| `BETA_NOTIFY_EMAIL` | Recipient of new-lead notifications (e.g. `support@fuzely.ai`). |
+
+The client (`config.js`) knows only the same-origin path `/api/beta-waitlist` —
+no secrets ever reach the browser.
+
+## Table shape — `public.beta_waitlist_leads`
+
+`id`, `created_at`, `name`, `email` **(UNIQUE)**, `company`, `website`, `role`,
+`interest`, `notes`, `source`, `page_url`, `user_agent`, `status`. RLS enabled,
+no public policies (only the service-role route writes).
+
+## JSON payload (client → route)
 
 ```json
 {
-  "name":     "string (required)",
-  "email":    "string (required, validated)",
-  "company":  "string",
-  "website":  "string",
-  "role":     "string",
-  "interest": "string (from the Primary interest select)",
-  "notes":    "string (optional)"
+  "name": "string (required)",
+  "email": "string (required, validated; normalized server-side)",
+  "company": "string",
+  "website": "string",
+  "role": "string",
+  "interest": "string",
+  "notes": "string",
+  "honeypot": "string (must be empty for a real user)",
+  "page_url": "string (location.href)",
+  "user_agent": "string (server prefers the request header)"
 }
 ```
 
-`Content-Type: application/json`. Fields are always present (empty string if the
-user left them blank), except that submission is blocked unless `name` and
-`email` are valid.
-
-## Candidate backends
-
-Any endpoint that accepts a JSON POST works. Options, cheapest-first:
-
-- **Supabase insert** — a small Edge Function (or PostgREST endpoint) that
-  inserts the payload into a `beta_applications` table. Add a server-side check
-  and rate-limit; never expose a service-role key in `config.js`.
-- **Resend notification** — a serverless function that emails the team the
-  application (good for low volume; pair with storage if you want a record).
-- **CRM / webhook** — HubSpot form endpoint, a Zapier/Make catch hook, or any
-  marketing-CRM intake URL that accepts JSON.
-
-Whatever you pick, the browser only knows a single POST URL — keep all secrets on
-the server side of that URL.
-
 ## How to test
 
-- **Placeholder (today):** load the page, submit the beta form with a valid name
-  + email → expect the "not connected yet" message and a console log of the
-  payload; **no** success state.
-- **Validation:** submit with an empty name or a malformed email → expect an
-  inline error and a red border on the offending field(s); confirm there is **no**
-  red border before the first submit.
-- **Wired:** set `betaEndpoint` to a test URL (e.g. a request-bin), submit, and
-  confirm the POST body matches the shape above and the genuine success message
-  appears only on a `2xx`.
-- Run both the desktop (`#beta`) and mobile (`#beta-m`) copies — they must behave
-  identically.
+**Production (after deploy, with the Vercel env vars set):**
+- Submit the form on `https://www.fuzely.ai` with a real name + email → expect
+  the genuine success message; confirm a row in `beta_waitlist_leads` and a
+  notification email at `BETA_NOTIFY_EMAIL`.
+- Submit the **same email** again → success message ("already on the list"), **no
+  second row**.
+- Submit with an empty name or bad email → inline error, no insert.
+- Honeypot: via devtools, set the hidden `[data-hp]` input's value and submit →
+  `200` success but **no row** inserted.
+- Run both desktop (`#beta`) and mobile (`#beta-m`) — identical behavior.
+
+**Local:** the static page can be opened directly, but `/api/beta-waitlist`
+only runs under Vercel. Use `vercel dev` (with the same env vars in a local
+`.env` that is **git-ignored**) to exercise the route locally, or test against a
+Preview deployment.
+
+## Notes
+
+- To use the Supabase JS SDK instead of REST, add `@supabase/supabase-js` to a
+  `package.json` and swap the insert call; Vercel will then install it for the
+  function. The current zero-dep REST approach avoids that install step.
+- `curl` example (do not paste real keys anywhere public):
+  `curl -X POST https://www.fuzely.ai/api/beta-waitlist -H 'Content-Type: application/json' -d '{"name":"Test","email":"test@example.com"}'`

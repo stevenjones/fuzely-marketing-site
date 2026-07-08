@@ -463,6 +463,11 @@
           var el = form.querySelector('[name="' + k + '"]');
           if (el) payload[k] = (el.value || '').trim();
         });
+        // Honeypot (hidden field bots fill) + request context for the API.
+        var hp = form.querySelector('[data-hp]');
+        payload.honeypot = hp ? (hp.value || '') : '';
+        payload.page_url = location.href;
+        payload.user_agent = navigator.userAgent;
 
         var endpoint = CONFIG.betaEndpoint;
         if (!endpoint) {
@@ -472,19 +477,30 @@
           return;
         }
 
-        // Endpoint configured → real submit + genuine success. Inert today because
-        // the shipped config value is null (this path exists for future wiring).
+        // Real submit → genuine success/error. Disable the button in flight to
+        // prevent duplicate rapid submits; re-enable on completion.
+        var btn = form.querySelector('button');
+        if (btn) btn.disabled = true;
         showMsg('Submitting…', false);
         fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         }).then(function (res) {
-          if (!res.ok) throw new Error('bad status ' + res.status);
-          form.reset();
-          showMsg('You’re on the list — we’ll be in touch about your application.', false);
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            if (btn) btn.disabled = false;
+            if (!res.ok || !data || data.ok !== true) {
+              showMsg((data && data.error) ? data.error : 'Something went wrong. Please try again.', true);
+              return;
+            }
+            form.reset();
+            showMsg(data.duplicate
+              ? 'You’re already on the list — we’ll be in touch.'
+              : 'You’re on the list — we’ll be in touch.', false);
+          });
         }).catch(function () {
-          showMsg('Something went wrong sending your application. Please try again.', true);
+          if (btn) btn.disabled = false;
+          showMsg('Something went wrong. Please try again.', true);
         });
       });
     });
